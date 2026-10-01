@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <ItemGroup>
+    <PackageReference Include="SwiftBets.BuildingBlocks.Observability" />
+    <PackageReference Include="SwiftBets.BuildingBlocks.Web" />
+    <ProjectReference Include="../SwiftBets.Config.Infrastructure/SwiftBets.Config.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>
