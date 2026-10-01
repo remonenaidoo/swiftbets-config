@@ -1,0 +1,2 @@
+# swiftbets-config
+SwiftBets config
