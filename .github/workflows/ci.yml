@@ -1,0 +1,23 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dotnet:
+    uses: remonenaidoo/swiftbets-platform/.github/workflows/dotnet.yml@main
+    with:
+      images: '[{"name": "swiftbets-config", "dockerfile": "deploy/SwiftBets.Config.Api.Dockerfile"}, {"name": "swiftbets-config-migrator", "dockerfile": "deploy/SwiftBets.Config.Migrator.Dockerfile"}]'
+      coverage: true
+      coverage-floors: '{"SwiftBets.Config.Domain": {"branch": 90}, "SwiftBets.Config.Application": {"branch": 90}}'
+    permissions:
+      contents: read
+      packages: write
+      security-events: write
