@@ -78,6 +78,20 @@ public sealed class ConfigFlowTests(PostgresFixture postgres, RedpandaFixture re
     }
 
     [Fact]
+    public async Task Steward_engages_the_kill_switch_as_a_service_and_the_history_names_it()
+    {
+        await using var host = await ConfigHost.StartAsync(postgres, redpanda);
+        using var steward = host.CreateClient();
+        steward.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", ConfigHost.ServiceToken("steward"));
+        using var reader = Client(host, "config.read");
+
+        (await PutAsync(steward, ConfigKeys.PlacementKillSwitch, "on", "Steward: approved remediation")).StatusCode.ShouldBe(HttpStatusCode.OK);
+
+        var history = await reader.GetFromJsonAsync<JsonElement>($"/admin/config/{ConfigKeys.PlacementKillSwitch}/history", TestContext.Current.CancellationToken);
+        history[0].GetProperty("changedBy").GetString().ShouldBe("client:steward");
+    }
+
+    [Fact]
     public async Task Migrator_is_idempotent_rolls_back_and_needs_a_connection_string()
     {
         var name = "cfgm_" + Guid.NewGuid().ToString("N")[..10];
