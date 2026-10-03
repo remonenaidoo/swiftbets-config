@@ -15,7 +15,8 @@ builder.Services.AddSwiftBetsWeb();
 builder.Services.AddSwiftBetsJwtBearer(builder.Configuration);
 builder.Services.AddAuthorizationBuilder()
     .AddPolicy(ConfigEndpoints.ReadPermission, p => p.RequireClaim("perm", ConfigEndpoints.ReadPermission))
-    .AddPolicy(ConfigEndpoints.WritePermission, p => p.RequireClaim("perm", ConfigEndpoints.WritePermission));
+    // Staff need config.write; Steward's approved remediations (the kill switch) arrive as a service and are recorded under its client id.
+    .AddPolicy(ConfigEndpoints.WritePermission, p => p.RequireAssertion(c => c.User.HasClaim("perm", ConfigEndpoints.WritePermission) || c.User.IsInRole("Service")));
 builder.Services.AddConfigApplication();
 builder.Services.AddConfigInfrastructure(builder.Configuration);
 

@@ -79,6 +79,19 @@ internal sealed class ConfigHost : WebApplicationFactory<Program>
         });
     }
 
+    public static string ServiceToken(string clientId)
+    {
+        var claims = new List<Claim> { new(JwtRegisteredClaimNames.Sub, $"client:{clientId}"), new("role", "Service") };
+        return new JsonWebTokenHandler().CreateToken(new SecurityTokenDescriptor
+        {
+            Issuer = Issuer,
+            Audience = "swiftbets",
+            Subject = new ClaimsIdentity(claims),
+            Expires = DateTime.UtcNow.AddMinutes(10),
+            SigningCredentials = new SigningCredentials(Key, SecurityAlgorithms.RsaSha256),
+        });
+    }
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Testing");
